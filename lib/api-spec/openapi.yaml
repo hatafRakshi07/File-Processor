@@ -3,20 +3,42 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Bissi / Committee / Chit Fund Management System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: dashboard
+    description: Dashboard statistics
+  - name: branches
+    description: Branch management
+  - name: customers
+    description: Customer management
+  - name: collectors
+    description: Collector management
+  - name: committees
+    description: Committee/Bissi management
+  - name: tokens
+    description: Token management
+  - name: loans
+    description: Loan management
+  - name: collections
+    description: Collection/Payment management
+  - name: lotteries
+    description: Lottery management
+  - name: reports
+    description: Reports and analytics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +46,1108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+
+  # Dashboard
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/collection-trend:
+    get:
+      operationId: getCollectionTrend
+      tags: [dashboard]
+      summary: Get collection trend for last 30 days
+      responses:
+        "200":
+          description: Collection trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendPoint"
+
+  /dashboard/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent system activity
+      responses:
+        "200":
+          description: Recent activity list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /dashboard/branch-summary:
+    get:
+      operationId: getBranchSummary
+      tags: [dashboard]
+      summary: Get per-branch collection summary
+      responses:
+        "200":
+          description: Branch summary list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BranchSummary"
+
+  # Branches
+  /branches:
+    get:
+      operationId: listBranches
+      tags: [branches]
+      summary: List all branches
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of branches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Branch"
+    post:
+      operationId: createBranch
+      tags: [branches]
+      summary: Create a branch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BranchInput"
+      responses:
+        "201":
+          description: Branch created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Branch"
+
+  /branches/{id}:
+    get:
+      operationId: getBranch
+      tags: [branches]
+      summary: Get branch by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Branch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Branch"
+    patch:
+      operationId: updateBranch
+      tags: [branches]
+      summary: Update a branch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BranchUpdate"
+      responses:
+        "200":
+          description: Branch updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Branch"
+    delete:
+      operationId: deleteBranch
+      tags: [branches]
+      summary: Delete a branch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # Customers
+  /customers:
+    get:
+      operationId: listCustomers
+      tags: [customers]
+      summary: List customers
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerListResponse"
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      summary: Create a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerInput"
+      responses:
+        "201":
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      summary: Get customer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    patch:
+      operationId: updateCustomer
+      tags: [customers]
+      summary: Update a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerUpdate"
+      responses:
+        "200":
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      summary: Delete a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /customers/{id}/passbook:
+    get:
+      operationId: getCustomerPassbook
+      tags: [customers]
+      summary: Get customer digital passbook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer passbook
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Passbook"
+
+  /customers/{id}/timeline:
+    get:
+      operationId: getCustomerTimeline
+      tags: [customers]
+      summary: Get customer activity timeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineEntry"
+
+  # Collectors
+  /collectors:
+    get:
+      operationId: listCollectors
+      tags: [collectors]
+      summary: List collectors
+      parameters:
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of collectors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collector"
+    post:
+      operationId: createCollector
+      tags: [collectors]
+      summary: Create a collector
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectorInput"
+      responses:
+        "201":
+          description: Collector created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collector"
+
+  /collectors/{id}:
+    get:
+      operationId: getCollector
+      tags: [collectors]
+      summary: Get collector by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collector"
+    patch:
+      operationId: updateCollector
+      tags: [collectors]
+      summary: Update a collector
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectorUpdate"
+      responses:
+        "200":
+          description: Collector updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collector"
+    delete:
+      operationId: deleteCollector
+      tags: [collectors]
+      summary: Delete a collector
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /collectors/{id}/performance:
+    get:
+      operationId: getCollectorPerformance
+      tags: [collectors]
+      summary: Get collector performance summary
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collector performance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectorPerformance"
+
+  # Committees
+  /committees:
+    get:
+      operationId: listCommittees
+      tags: [committees]
+      summary: List committees/bissi
+      parameters:
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of committees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Committee"
+    post:
+      operationId: createCommittee
+      tags: [committees]
+      summary: Create a committee/bissi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommitteeInput"
+      responses:
+        "201":
+          description: Committee created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Committee"
+
+  /committees/{id}:
+    get:
+      operationId: getCommittee
+      tags: [committees]
+      summary: Get committee by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Committee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Committee"
+    patch:
+      operationId: updateCommittee
+      tags: [committees]
+      summary: Update a committee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommitteeUpdate"
+      responses:
+        "200":
+          description: Committee updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Committee"
+
+  /committees/{id}/members:
+    get:
+      operationId: listCommitteeMembers
+      tags: [committees]
+      summary: List committee members
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommitteeMember"
+    post:
+      operationId: addCommitteeMember
+      tags: [committees]
+      summary: Add member to committee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommitteeMemberInput"
+      responses:
+        "201":
+          description: Member added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommitteeMember"
+
+  # Tokens
+  /tokens:
+    get:
+      operationId: listTokens
+      tags: [tokens]
+      summary: List tokens
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: committeeId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Token"
+    post:
+      operationId: createToken
+      tags: [tokens]
+      summary: Allocate a token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenInput"
+      responses:
+        "201":
+          description: Token allocated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+
+  /tokens/{id}:
+    get:
+      operationId: getToken
+      tags: [tokens]
+      summary: Get token by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+    patch:
+      operationId: updateToken
+      tags: [tokens]
+      summary: Update a token
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenUpdate"
+      responses:
+        "200":
+          description: Token updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+
+  # Loans
+  /loans:
+    get:
+      operationId: listLoans
+      tags: [loans]
+      summary: List loans
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of loans
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanListResponse"
+    post:
+      operationId: createLoan
+      tags: [loans]
+      summary: Create/apply for a loan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoanInput"
+      responses:
+        "201":
+          description: Loan created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Loan"
+
+  /loans/{id}:
+    get:
+      operationId: getLoan
+      tags: [loans]
+      summary: Get loan by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Loan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Loan"
+    patch:
+      operationId: updateLoan
+      tags: [loans]
+      summary: Update loan status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoanUpdate"
+      responses:
+        "200":
+          description: Loan updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Loan"
+
+  /loans/{id}/emi-schedule:
+    get:
+      operationId: getLoanEmiSchedule
+      tags: [loans]
+      summary: Get EMI schedule for a loan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: EMI schedule
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmiEntry"
+
+  /loans/summary:
+    get:
+      operationId: getLoanSummary
+      tags: [loans]
+      summary: Get loan portfolio summary
+      responses:
+        "200":
+          description: Loan summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanSummary"
+
+  # Collections
+  /collections:
+    get:
+      operationId: listCollections
+      tags: [collections]
+      summary: List collections/payments
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: collectorId
+          in: query
+          schema:
+            type: integer
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: date
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionListResponse"
+    post:
+      operationId: createCollection
+      tags: [collections]
+      summary: Record a collection/payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectionInput"
+      responses:
+        "201":
+          description: Collection recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+
+  /collections/{id}:
+    get:
+      operationId: getCollection
+      tags: [collections]
+      summary: Get collection by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+
+  /collections/today-summary:
+    get:
+      operationId: getTodayCollectionSummary
+      tags: [collections]
+      summary: Get today's collection summary
+      responses:
+        "200":
+          description: Today's summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodaySummary"
+
+  /collections/due-today:
+    get:
+      operationId: getDueToday
+      tags: [collections]
+      summary: Get customers with payments due today
+      responses:
+        "200":
+          description: Due today list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DueItem"
+
+  # Lotteries
+  /lotteries:
+    get:
+      operationId: listLotteries
+      tags: [lotteries]
+      summary: List lotteries
+      parameters:
+        - name: committeeId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of lotteries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lottery"
+    post:
+      operationId: createLottery
+      tags: [lotteries]
+      summary: Create a lottery draw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LotteryInput"
+      responses:
+        "201":
+          description: Lottery created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lottery"
+
+  /lotteries/{id}:
+    get:
+      operationId: getLottery
+      tags: [lotteries]
+      summary: Get lottery by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lottery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lottery"
+    patch:
+      operationId: updateLottery
+      tags: [lotteries]
+      summary: Update lottery / declare winner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LotteryUpdate"
+      responses:
+        "200":
+          description: Lottery updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lottery"
+
+  /lotteries/{id}/draw:
+    post:
+      operationId: conductDraw
+      tags: [lotteries]
+      summary: Conduct a lottery draw (auto-select winner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Draw result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lottery"
+
+  # Reports
+  /reports/collection:
+    get:
+      operationId: getCollectionReport
+      tags: [reports]
+      summary: Get collection report
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+        - name: collectorId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collection report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionReport"
+
+  /reports/loan:
+    get:
+      operationId: getLoanReport
+      tags: [reports]
+      summary: Get loan report
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+        - name: branchId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Loan report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoanReport"
+
+  /reports/customer-statement:
+    get:
+      operationId: fetchCustomerStatement
+      tags: [reports]
+      summary: Get customer account statement
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer statement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerStatement"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +1158,940 @@ components:
       required:
         - status
 
+    LoginInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, username, role, name]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum: [super_admin, owner, branch_manager, collector, accountant, customer]
+        branchId:
+          type: ["integer", "null"]
+        branchName:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+
+    DashboardStats:
+      type: object
+      required: [totalCustomers, totalBranches, totalCollectors, todayCollection, todayDue, totalActiveLoans, totalActiveCommittees, totalPendingLoans, monthlyCollection, outstandingLoanAmount]
+      properties:
+        totalCustomers:
+          type: integer
+        totalBranches:
+          type: integer
+        totalCollectors:
+          type: integer
+        todayCollection:
+          type: number
+        todayDue:
+          type: number
+        totalActiveLoans:
+          type: integer
+        totalActiveCommittees:
+          type: integer
+        totalPendingLoans:
+          type: integer
+        monthlyCollection:
+          type: number
+        outstandingLoanAmount:
+          type: number
+
+    TrendPoint:
+      type: object
+      required: [date, amount, count]
+      properties:
+        date:
+          type: string
+        amount:
+          type: number
+        count:
+          type: integer
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        description:
+          type: string
+        customerName:
+          type: ["string", "null"]
+        amount:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+
+    BranchSummary:
+      type: object
+      required: [branchId, branchName, totalCollection, totalCustomers, totalCollectors]
+      properties:
+        branchId:
+          type: integer
+        branchName:
+          type: string
+        totalCollection:
+          type: number
+        totalCustomers:
+          type: integer
+        totalCollectors:
+          type: integer
+
+    Branch:
+      type: object
+      required: [id, name, code, city, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        city:
+          type: string
+        address:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        managerName:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, inactive]
+        totalCustomers:
+          type: integer
+        totalCollectors:
+          type: integer
+        createdAt:
+          type: string
+
+    BranchInput:
+      type: object
+      required: [name, code, city]
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        managerName:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+
+    BranchUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        managerName:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+
+    Customer:
+      type: object
+      required: [id, referenceNumber, name, mobile, status, branchId, createdAt]
+      properties:
+        id:
+          type: integer
+        referenceNumber:
+          type: string
+        name:
+          type: string
+        mobile:
+          type: string
+        alternateMobile:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        aadhaar:
+          type: ["string", "null"]
+        pan:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        nomineeNname:
+          type: ["string", "null"]
+        nomineeRelation:
+          type: ["string", "null"]
+        branchId:
+          type: integer
+        branchName:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, inactive, blocked]
+        totalTokens:
+          type: integer
+        totalLoans:
+          type: integer
+        totalPaid:
+          type: number
+        createdAt:
+          type: string
+
+    CustomerInput:
+      type: object
+      required: [name, mobile, branchId]
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+        alternateMobile:
+          type: string
+        email:
+          type: string
+        aadhaar:
+          type: string
+        pan:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        nomineeName:
+          type: string
+        nomineeRelation:
+          type: string
+        branchId:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive, blocked]
+
+    CustomerUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+        alternateMobile:
+          type: string
+        email:
+          type: string
+        aadhaar:
+          type: string
+        pan:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        nomineeName:
+          type: string
+        nomineeRelation:
+          type: string
+        branchId:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive, blocked]
+
+    CustomerListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Customer"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    Passbook:
+      type: object
+      required: [customer, entries, totalPaid, totalDue]
+      properties:
+        customer:
+          $ref: "#/components/schemas/Customer"
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassbookEntry"
+        totalPaid:
+          type: number
+        totalDue:
+          type: number
+
+    PassbookEntry:
+      type: object
+      required: [id, type, description, amount, date]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [payment, loan_disbursed, loan_emi, lottery_win, token_allocation]
+        description:
+          type: string
+        amount:
+          type: number
+        balance:
+          type: ["number", "null"]
+        date:
+          type: string
+
+    TimelineEntry:
+      type: object
+      required: [id, type, title, description, date]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        amount:
+          type: ["number", "null"]
+        date:
+          type: string
+
+    Collector:
+      type: object
+      required: [id, name, mobile, branchId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        mobile:
+          type: string
+        email:
+          type: ["string", "null"]
+        branchId:
+          type: integer
+        branchName:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, inactive]
+        totalCollections:
+          type: integer
+        totalAmount:
+          type: number
+        createdAt:
+          type: string
+
+    CollectorInput:
+      type: object
+      required: [name, mobile, branchId]
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+        email:
+          type: string
+        branchId:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive]
+
+    CollectorUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+        email:
+          type: string
+        branchId:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive]
+
+    CollectorPerformance:
+      type: object
+      required: [collectorId, totalCollections, totalAmount, successRate, thisMonthAmount, thisMonthCount]
+      properties:
+        collectorId:
+          type: integer
+        totalCollections:
+          type: integer
+        totalAmount:
+          type: number
+        successRate:
+          type: number
+        thisMonthAmount:
+          type: number
+        thisMonthCount:
+          type: integer
+        dailyTrend:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrendPoint"
+
+    Committee:
+      type: object
+      required: [id, name, type, installmentAmount, memberLimit, status, branchId, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [daily, weekly, monthly, festival, special]
+        installmentAmount:
+          type: number
+        memberLimit:
+          type: integer
+        currentMembers:
+          type: integer
+        drawDate:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+        branchId:
+          type: integer
+        branchName:
+          type: ["string", "null"]
+        totalCollected:
+          type: number
+        createdAt:
+          type: string
+
+    CommitteeInput:
+      type: object
+      required: [name, type, installmentAmount, memberLimit, branchId]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [daily, weekly, monthly, festival, special]
+        installmentAmount:
+          type: number
+        memberLimit:
+          type: integer
+        drawDate:
+          type: string
+        branchId:
+          type: integer
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+
+    CommitteeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        installmentAmount:
+          type: number
+        memberLimit:
+          type: integer
+        drawDate:
+          type: string
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+
+    CommitteeMember:
+      type: object
+      required: [id, committeeId, customerId, customerName, tokenNumber, joinedAt]
+      properties:
+        id:
+          type: integer
+        committeeId:
+          type: integer
+        customerId:
+          type: integer
+        customerName:
+          type: string
+        customerMobile:
+          type: ["string", "null"]
+        tokenNumber:
+          type: string
+        status:
+          type: string
+        joinedAt:
+          type: string
+
+    CommitteeMemberInput:
+      type: object
+      required: [customerId]
+      properties:
+        customerId:
+          type: integer
+        tokenNumber:
+          type: string
+
+    Token:
+      type: object
+      required: [id, tokenNumber, customerId, committeeId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        tokenNumber:
+          type: string
+        customerId:
+          type: integer
+        customerName:
+          type: ["string", "null"]
+        committeeId:
+          type: integer
+        committeeName:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, transferred, closed]
+        createdAt:
+          type: string
+
+    TokenInput:
+      type: object
+      required: [customerId, committeeId]
+      properties:
+        customerId:
+          type: integer
+        committeeId:
+          type: integer
+        tokenNumber:
+          type: string
+
+    TokenUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [active, transferred, closed]
+        transferToCustomerId:
+          type: integer
+
+    Loan:
+      type: object
+      required: [id, customerId, principalAmount, interestRate, interestType, tenure, status, branchId, createdAt]
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        customerName:
+          type: ["string", "null"]
+        customerMobile:
+          type: ["string", "null"]
+        principalAmount:
+          type: number
+        interestRate:
+          type: number
+        interestType:
+          type: string
+          enum: [flat, reducing]
+        tenure:
+          type: integer
+        emiAmount:
+          type: ["number", "null"]
+        totalAmount:
+          type: ["number", "null"]
+        paidAmount:
+          type: number
+        outstandingAmount:
+          type: ["number", "null"]
+        status:
+          type: string
+          enum: [pending, approved, active, closed, rejected, overdue]
+        branchId:
+          type: integer
+        branchName:
+          type: ["string", "null"]
+        disbursedAt:
+          type: ["string", "null"]
+        dueDate:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    LoanInput:
+      type: object
+      required: [customerId, principalAmount, interestRate, interestType, tenure, branchId]
+      properties:
+        customerId:
+          type: integer
+        principalAmount:
+          type: number
+        interestRate:
+          type: number
+        interestType:
+          type: string
+          enum: [flat, reducing]
+        tenure:
+          type: integer
+        branchId:
+          type: integer
+        purpose:
+          type: string
+
+    LoanUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, approved, active, closed, rejected, overdue]
+        disbursedAt:
+          type: string
+
+    LoanListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Loan"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    EmiEntry:
+      type: object
+      required: [installmentNumber, dueDate, emiAmount, principalComponent, interestComponent, status]
+      properties:
+        installmentNumber:
+          type: integer
+        dueDate:
+          type: string
+        emiAmount:
+          type: number
+        principalComponent:
+          type: number
+        interestComponent:
+          type: number
+        paidAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, overdue, partial]
+
+    LoanSummary:
+      type: object
+      required: [totalLoans, activeLoans, pendingApproval, totalDisbursed, totalOutstanding, totalOverdue]
+      properties:
+        totalLoans:
+          type: integer
+        activeLoans:
+          type: integer
+        pendingApproval:
+          type: integer
+        totalDisbursed:
+          type: number
+        totalOutstanding:
+          type: number
+        totalOverdue:
+          type: number
+
+    Collection:
+      type: object
+      required: [id, customerId, amount, paymentMode, collectedAt, createdAt]
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        customerName:
+          type: ["string", "null"]
+        customerMobile:
+          type: ["string", "null"]
+        collectorId:
+          type: ["integer", "null"]
+        collectorName:
+          type: ["string", "null"]
+        branchId:
+          type: ["integer", "null"]
+        committeeId:
+          type: ["integer", "null"]
+        committeeName:
+          type: ["string", "null"]
+        loanId:
+          type: ["integer", "null"]
+        amount:
+          type: number
+        paymentMode:
+          type: string
+          enum: [cash, upi, bank, card]
+        receiptNumber:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        collectedAt:
+          type: string
+        createdAt:
+          type: string
+
+    CollectionInput:
+      type: object
+      required: [customerId, amount, paymentMode]
+      properties:
+        customerId:
+          type: integer
+        collectorId:
+          type: integer
+        committeeId:
+          type: integer
+        loanId:
+          type: integer
+        amount:
+          type: number
+        paymentMode:
+          type: string
+          enum: [cash, upi, bank, card]
+        notes:
+          type: string
+        collectedAt:
+          type: string
+
+    CollectionListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Collection"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    TodaySummary:
+      type: object
+      required: [totalAmount, totalCount, cashAmount, upiAmount, bankAmount, cardAmount]
+      properties:
+        totalAmount:
+          type: number
+        totalCount:
+          type: integer
+        cashAmount:
+          type: number
+        upiAmount:
+          type: number
+        bankAmount:
+          type: number
+        cardAmount:
+          type: number
+
+    DueItem:
+      type: object
+      required: [customerId, customerName, mobile, dueAmount, committeeId]
+      properties:
+        customerId:
+          type: integer
+        customerName:
+          type: string
+        mobile:
+          type: string
+        referenceNumber:
+          type: string
+        dueAmount:
+          type: number
+        committeeId:
+          type: integer
+        committeeName:
+          type: string
+        lastPaidAt:
+          type: ["string", "null"]
+
+    Lottery:
+      type: object
+      required: [id, committeeId, drawDate, status, createdAt]
+      properties:
+        id:
+          type: integer
+        committeeId:
+          type: integer
+        committeeName:
+          type: ["string", "null"]
+        drawDate:
+          type: string
+        winnerId:
+          type: ["integer", "null"]
+        winnerName:
+          type: ["string", "null"]
+        winnerToken:
+          type: ["string", "null"]
+        prizeAmount:
+          type: ["number", "null"]
+        status:
+          type: string
+          enum: [scheduled, completed, cancelled]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    LotteryInput:
+      type: object
+      required: [committeeId, drawDate]
+      properties:
+        committeeId:
+          type: integer
+        drawDate:
+          type: string
+        prizeAmount:
+          type: number
+        notes:
+          type: string
+
+    LotteryUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [scheduled, completed, cancelled]
+        winnerId:
+          type: integer
+        prizeAmount:
+          type: number
+        notes:
+          type: string
+
+    CollectionReport:
+      type: object
+      required: [startDate, endDate, totalAmount, totalCount, byBranch, byPaymentMode, daily]
+      properties:
+        startDate:
+          type: string
+        endDate:
+          type: string
+        totalAmount:
+          type: number
+        totalCount:
+          type: integer
+        byBranch:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportBranchRow"
+        byPaymentMode:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportModeRow"
+        daily:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrendPoint"
+
+    ReportBranchRow:
+      type: object
+      required: [branchName, amount, count]
+      properties:
+        branchName:
+          type: string
+        amount:
+          type: number
+        count:
+          type: integer
+
+    ReportModeRow:
+      type: object
+      required: [mode, amount, count]
+      properties:
+        mode:
+          type: string
+        amount:
+          type: number
+        count:
+          type: integer
+
+    LoanReport:
+      type: object
+      required: [startDate, endDate, totalLoans, totalDisbursed, totalCollected, totalOverdue]
+      properties:
+        startDate:
+          type: string
+        endDate:
+          type: string
+        totalLoans:
+          type: integer
+        totalDisbursed:
+          type: number
+        totalCollected:
+          type: number
+        totalOverdue:
+          type: number
+        byBranch:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportBranchRow"
+
+    CustomerStatement:
+      type: object
+      required: [customer, startDate, endDate, entries, openingBalance, closingBalance]
+      properties:
+        customer:
+          $ref: "#/components/schemas/Customer"
+        startDate:
+          type: string
+        endDate:
+          type: string
+        openingBalance:
+          type: number
+        closingBalance:
+          type: number
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassbookEntry"

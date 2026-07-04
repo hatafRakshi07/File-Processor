@@ -1,0 +1,2 @@
+- [Bissi auth pattern](bissi-auth.md) — SHA-256 + in-memory sessions Map; requireAuth middleware gates all non-auth routes
+- [Bissi seed credentials](bissi-seed.md) — demo users and data for dev/testing
