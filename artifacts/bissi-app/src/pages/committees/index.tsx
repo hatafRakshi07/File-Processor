@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import { useListCommittees, useCreateCommittee, useListBranches } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -229,7 +230,11 @@ export default function CommitteesPage() {
               ) : (
                 committees?.map((comm) => (
                   <TableRow key={comm.id} className="hover:bg-muted/50">
-                    <TableCell className="pl-4 font-medium">{comm.name}</TableCell>
+                    <TableCell className="pl-4 font-medium">
+                      <Link href={`/committees/${comm.id}`}>
+                        <span className="hover:underline text-primary">{comm.name}</span>
+                      </Link>
+                    </TableCell>
                     <TableCell className="capitalize">{comm.type}</TableCell>
                     <TableCell className="text-right font-medium">{formatCurrency(comm.installmentAmount)}</TableCell>
                     <TableCell className="text-center">

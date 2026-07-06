@@ -9,7 +9,7 @@ function genReceipt(): string {
 }
 
 router.get("/collections", async (req, res): Promise<void> => {
-  const { customerId, collectorId, branchId, date, status, page = "1", limit = "20" } = req.query;
+  const { customerId, collectorId, branchId, committeeId, loanId, date, status, page = "1", limit = "20" } = req.query;
   const pageNum = parseInt(page as string, 10);
   const limitNum = Math.min(parseInt(limit as string, 10), 100);
   const offset = (pageNum - 1) * limitNum;
@@ -30,6 +30,8 @@ router.get("/collections", async (req, res): Promise<void> => {
 
   if (customerId) rows = rows.filter((r) => r.c.customerId === parseInt(customerId as string, 10));
   if (collectorId) rows = rows.filter((r) => r.c.collectorId === parseInt(collectorId as string, 10));
+  if (committeeId) rows = rows.filter((r) => r.c.committeeId === parseInt(committeeId as string, 10));
+  if (loanId) rows = rows.filter((r) => r.c.loanId === parseInt(loanId as string, 10));
   if (branchId) rows = rows.filter((r) => r.c.branchId === parseInt(branchId as string, 10));
   if (date) {
     const d = new Date(date as string);

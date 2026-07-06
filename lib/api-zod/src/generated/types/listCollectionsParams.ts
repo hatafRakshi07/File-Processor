@@ -9,6 +9,8 @@
 export type ListCollectionsParams = {
 customerId?: number;
 collectorId?: number;
+committeeId?: number;
+loanId?: number;
 branchId?: number;
 date?: string;
 status?: string;

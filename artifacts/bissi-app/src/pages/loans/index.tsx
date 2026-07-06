@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import {
   useListLoans,
   useCreateLoan,
@@ -337,7 +338,9 @@ export default function LoansPage() {
                 loans.data.map((loan) => (
                   <TableRow key={loan.id} className="hover:bg-muted/50">
                     <TableCell className="pl-4">
-                      <div className="font-medium">{loan.customerName ?? `#${loan.customerId}`}</div>
+                      <Link href={`/loans/${loan.id}`}>
+                        <div className="font-medium hover:underline text-primary cursor-pointer">{loan.customerName ?? `#${loan.customerId}`}</div>
+                      </Link>
                       {loan.customerMobile && (
                         <div className="text-xs text-muted-foreground">{loan.customerMobile}</div>
                       )}

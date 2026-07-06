@@ -869,6 +869,14 @@ paths:
           in: query
           schema:
             type: integer
+        - name: committeeId
+          in: query
+          schema:
+            type: integer
+        - name: loanId
+          in: query
+          schema:
+            type: integer
         - name: branchId
           in: query
           schema:

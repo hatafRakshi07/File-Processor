@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import { useListCollectors, useCreateCollector, useListBranches } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,7 +184,11 @@ export default function CollectorsPage() {
               ) : (
                 collectors?.map((collector) => (
                   <TableRow key={collector.id} className="hover:bg-muted/50 cursor-pointer">
-                    <TableCell className="pl-4 font-medium">{collector.name}</TableCell>
+                    <TableCell className="pl-4 font-medium">
+                      <Link href={`/collectors/${collector.id}`}>
+                        <span className="hover:underline text-primary">{collector.name}</span>
+                      </Link>
+                    </TableCell>
                     <TableCell>{collector.mobile}</TableCell>
                     <TableCell>{collector.branchName}</TableCell>
                     <TableCell className="text-right">{collector.totalCollections || 0}</TableCell>

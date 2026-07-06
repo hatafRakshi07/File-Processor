@@ -14,10 +14,14 @@ import DashboardPage from "@/pages/dashboard";
 import CustomersPage from "@/pages/customers";
 import CustomerDetailPage from "@/pages/customers/[id]";
 import BranchesPage from "@/pages/branches";
+import BranchDetailPage from "@/pages/branches/[id]";
 import CollectorsPage from "@/pages/collectors";
+import CollectorDetailPage from "@/pages/collectors/[id]";
 import CommitteesPage from "@/pages/committees";
+import CommitteeDetailPage from "@/pages/committees/[id]";
 import TokensPage from "@/pages/tokens";
 import LoansPage from "@/pages/loans";
+import LoanDetailPage from "@/pages/loans/[id]";
 import CollectionsPage from "@/pages/collections";
 import LotteriesPage from "@/pages/lotteries";
 import ReportsPage from "@/pages/reports";
@@ -44,10 +48,14 @@ function AppRoutes() {
             <Route path="/customers" component={CustomersPage} />
             <Route path="/customers/:id" component={CustomerDetailPage} />
             <Route path="/branches" component={BranchesPage} />
+            <Route path="/branches/:id" component={BranchDetailPage} />
             <Route path="/collectors" component={CollectorsPage} />
+            <Route path="/collectors/:id" component={CollectorDetailPage} />
             <Route path="/committees" component={CommitteesPage} />
+            <Route path="/committees/:id" component={CommitteeDetailPage} />
             <Route path="/tokens" component={TokensPage} />
             <Route path="/loans" component={LoansPage} />
+            <Route path="/loans/:id" component={LoanDetailPage} />
             <Route path="/collections" component={CollectionsPage} />
             <Route path="/lotteries" component={LotteriesPage} />
             <Route path="/reports" component={ReportsPage} />

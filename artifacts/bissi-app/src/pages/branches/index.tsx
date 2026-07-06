@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import { useListBranches, useCreateBranch } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,7 +152,8 @@ export default function BranchesPage() {
           <div className="col-span-full py-8 text-center text-muted-foreground">No branches found.</div>
         ) : (
           branches?.map(branch => (
-            <Card key={branch.id} className="hover:shadow-md transition-shadow">
+            <Card key={branch.id} className="hover:shadow-md transition-shadow cursor-pointer">
+              <Link href={`/branches/${branch.id}`}>
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
@@ -182,6 +184,7 @@ export default function BranchesPage() {
                   </div>
                 </div>
               </CardContent>
+            </Link>
             </Card>
           ))
         )}

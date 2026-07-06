@@ -998,6 +998,8 @@ export const GetLoanSummaryResponse = zod.object({
 export const ListCollectionsQueryParams = zod.object({
   "customerId": zod.coerce.number().optional(),
   "collectorId": zod.coerce.number().optional(),
+  "committeeId": zod.coerce.number().optional(),
+  "loanId": zod.coerce.number().optional(),
   "branchId": zod.coerce.number().optional(),
   "date": zod.coerce.string().optional(),
   "status": zod.coerce.string().optional(),
