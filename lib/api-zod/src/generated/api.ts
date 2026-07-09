@@ -258,6 +258,10 @@ export const ListCustomersResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),
@@ -284,7 +288,11 @@ export const CreateCustomerBody = zod.object({
   "nomineeName": zod.string().optional(),
   "nomineeRelation": zod.string().optional(),
   "branchId": zod.number(),
-  "status": zod.enum(['active', 'inactive', 'blocked']).optional()
+  "status": zod.enum(['active', 'inactive', 'blocked']).optional(),
+  "photoUrl": zod.string().optional(),
+  "referenceName": zod.string().optional(),
+  "recoveryNotes": zod.string().optional(),
+  "documents": zod.string().optional()
 })
 
 export const CreateCustomerResponse = zod.object({
@@ -303,6 +311,10 @@ export const CreateCustomerResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),
@@ -333,6 +345,10 @@ export const GetCustomerResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),
@@ -359,7 +375,11 @@ export const UpdateCustomerBody = zod.object({
   "nomineeName": zod.string().optional(),
   "nomineeRelation": zod.string().optional(),
   "branchId": zod.number().optional(),
-  "status": zod.enum(['active', 'inactive', 'blocked']).optional()
+  "status": zod.enum(['active', 'inactive', 'blocked']).optional(),
+  "photoUrl": zod.string().optional(),
+  "referenceName": zod.string().optional(),
+  "recoveryNotes": zod.string().optional(),
+  "documents": zod.string().optional()
 })
 
 export const UpdateCustomerResponse = zod.object({
@@ -378,6 +398,10 @@ export const UpdateCustomerResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),
@@ -419,6 +443,10 @@ export const GetCustomerPassbookResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),
@@ -1327,6 +1355,10 @@ export const FetchCustomerStatementResponse = zod.object({
   "branchId": zod.number(),
   "branchName": zod.string().nullish(),
   "status": zod.enum(['active', 'inactive', 'blocked']),
+  "photoUrl": zod.string().nullish(),
+  "referenceName": zod.string().nullish(),
+  "recoveryNotes": zod.string().nullish(),
+  "documents": zod.string().nullish(),
   "totalTokens": zod.number().optional(),
   "totalLoans": zod.number().optional(),
   "totalPaid": zod.number().optional(),

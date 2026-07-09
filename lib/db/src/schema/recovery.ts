@@ -23,6 +23,8 @@ export const recoveryTasksTable = pgTable("recovery_tasks", {
   dueDate: date("due_date", { mode: "string" }),
   overdueAmount: text("overdue_amount"),
   notes: text("notes"),
+  reason: text("reason"),
+  reply: text("reply"),
   lastContactDate: date("last_contact_date", { mode: "string" }),
   nextFollowUpDate: date("next_follow_up_date", { mode: "string" }),
   resolutionNotes: text("resolution_notes"),

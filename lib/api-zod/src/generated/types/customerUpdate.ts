@@ -20,4 +20,8 @@ export interface CustomerUpdate {
   nomineeRelation?: string;
   branchId?: number;
   status?: CustomerUpdateStatus;
+  photoUrl?: string;
+  referenceName?: string;
+  recoveryNotes?: string;
+  documents?: string;
 }

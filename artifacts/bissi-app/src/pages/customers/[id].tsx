@@ -19,7 +19,12 @@ import {
   Clock, 
   Wallet,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Sparkles,
+  Gift,
+  FileText,
+  ShieldCheck,
+  AlertTriangle
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -50,27 +55,42 @@ export default function CustomerDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">{customer.name}</h1>
-            <Badge variant={customer.status === 'active' ? 'default' : 'secondary'}>
-              {customer.status}
-            </Badge>
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center shrink-0">
+            {customer.photoUrl ? (
+              <img src={customer.photoUrl} alt={customer.name} className="h-full w-full object-cover" />
+            ) : (
+              <User className="h-8 w-8 text-muted-foreground" />
+            )}
           </div>
-          <p className="text-muted-foreground font-mono text-sm">{customer.referenceNumber}</p>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold tracking-tight">{customer.name}</h1>
+              <Badge variant={customer.status === 'active' ? 'default' : 'secondary'}>
+                {customer.status}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground font-mono text-sm">{customer.referenceNumber}</p>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>Profile</CardTitle>
+            <CardTitle>Personal Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 text-sm">
               <Phone className="h-4 w-4 text-muted-foreground" />
               <span>{customer.mobile}</span>
             </div>
+            {customer.alternateMobile && (
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground/60" />
+                <span>Alt: {customer.alternateMobile}</span>
+              </div>
+            )}
             {customer.email && (
               <div className="flex items-center gap-3 text-sm">
                 <User className="h-4 w-4 text-muted-foreground" />
@@ -87,10 +107,22 @@ export default function CustomerDetailPage() {
               <Briefcase className="h-4 w-4 text-muted-foreground" />
               <span>Branch: {customer.branchName}</span>
             </div>
+            {customer.referenceName && (
+              <div className="flex items-center gap-3 text-sm">
+                <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                <span>Reference: {customer.referenceName}</span>
+              </div>
+            )}
             {customer.aadhaar && (
               <div className="flex items-center gap-3 text-sm">
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                 <span>Aadhaar: {customer.aadhaar}</span>
+              </div>
+            )}
+            {customer.pan && (
+              <div className="flex items-center gap-3 text-sm">
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <span>PAN: {customer.pan}</span>
               </div>
             )}
           </CardContent>
@@ -103,11 +135,11 @@ export default function CustomerDetailPage() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Total Tokens</p>
+                <p className="text-sm text-muted-foreground">Active Tokens</p>
                 <p className="text-2xl font-bold">{customer.totalTokens || 0}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Total Loans</p>
+                <p className="text-sm text-muted-foreground">Active Loans</p>
                 <p className="text-2xl font-bold">{customer.totalLoans || 0}</p>
               </div>
               <div className="space-y-1">
@@ -115,29 +147,41 @@ export default function CustomerDetailPage() {
                 <p className="text-2xl font-bold text-emerald-600">{formatCurrency(customer.totalPaid || 0)}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Outstanding</p>
+                <p className="text-sm text-muted-foreground">Pending Amount</p>
                 <p className="text-2xl font-bold text-destructive">{formatCurrency(passbook?.totalDue || 0)}</p>
               </div>
             </div>
+
+            {customer.recoveryNotes && (
+              <div className="mt-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-red-800 uppercase tracking-wider">Recovery Notes</p>
+                  <p className="text-sm text-red-700 mt-1">{customer.recoveryNotes}</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="passbook" className="w-full">
         <TabsList>
-          <TabsTrigger value="passbook">Passbook</TabsTrigger>
+          <TabsTrigger value="passbook">Passbook & Ledgers</TabsTrigger>
+          <TabsTrigger value="gifts">Gifts & Draws</TabsTrigger>
+          <TabsTrigger value="documents">Uploaded Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
         </TabsList>
         
         <TabsContent value="passbook" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Digital Passbook</CardTitle>
-              <CardDescription>Ledger of all financial transactions</CardDescription>
+              <CardTitle>Digital Ledger Statement</CardTitle>
+              <CardDescription>Transactional logs for all monthly installments and loans</CardDescription>
             </CardHeader>
             <CardContent>
               {passbookLoading ? (
-                <div className="py-8 text-center text-muted-foreground">Loading passbook...</div>
+                <div className="py-8 text-center text-muted-foreground">Loading ledger...</div>
               ) : (
                 <div className="relative border-l border-muted ml-4 space-y-8 pb-4">
                   {passbook?.entries.map((entry, idx) => (
@@ -175,11 +219,59 @@ export default function CustomerDetailPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="gifts" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lucky Draws & Gift History</CardTitle>
+              <CardDescription>Gift distribution and lottery logs for this customer</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="p-4 rounded-lg border border-dashed flex flex-col items-center justify-center text-center">
+                  <Gift className="h-10 w-10 text-muted-foreground/60 mb-2" />
+                  <p className="text-sm font-medium">No Gift distributions recorded yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">Gifts distributed via Lucky Draw will automatically show here.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Uploaded Documents</CardTitle>
+              <CardDescription>Aadhaar, PAN, and address proof verification documents</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {customer.documents ? (
+                  <div className="p-4 border rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-6 w-6 text-blue-600" />
+                      <div>
+                        <p className="text-sm font-medium">Customer Docs Package</p>
+                        <p className="text-xs text-muted-foreground">Verification Package PDF</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => customer.documents && window.open(customer.documents)}>View</Button>
+                  </div>
+                ) : (
+                  <div className="col-span-full py-8 text-center text-muted-foreground text-sm">
+                    No documents uploaded. Alternate/Aadhaar/PAN are registered in profile details.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
         <TabsContent value="timeline" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Customer Timeline</CardTitle>
+              <CardTitle>Customer Activity Timeline</CardTitle>
+              <CardDescription>Historical activity flow across all scheme enrollments</CardDescription>
             </CardHeader>
             <CardContent>
               {timelineLoading ? (

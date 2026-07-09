@@ -12,6 +12,7 @@ export const committeesTable = pgTable("committees", {
   installmentAmount: numeric("installment_amount", { precision: 12, scale: 2 }).notNull(),
   memberLimit: integer("member_limit").notNull(),
   drawDate: date("draw_date", { mode: "string" }),
+  duration: integer("duration"),
   status: committeeStatusEnum("status").notNull().default("active"),
   branchId: integer("branch_id").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

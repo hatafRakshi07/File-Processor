@@ -179,6 +179,14 @@ export interface Customer {
   /** @nullable */
   branchName?: string | null;
   status: CustomerStatus;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  referenceName?: string | null;
+  /** @nullable */
+  recoveryNotes?: string | null;
+  /** @nullable */
+  documents?: string | null;
   totalTokens?: number;
   totalLoans?: number;
   totalPaid?: number;
@@ -207,6 +215,10 @@ export interface CustomerInput {
   nomineeRelation?: string;
   branchId: number;
   status?: CustomerInputStatus;
+  photoUrl?: string;
+  referenceName?: string;
+  recoveryNotes?: string;
+  documents?: string;
 }
 
 export type CustomerUpdateStatus = typeof CustomerUpdateStatus[keyof typeof CustomerUpdateStatus];
@@ -231,6 +243,10 @@ export interface CustomerUpdate {
   nomineeRelation?: string;
   branchId?: number;
   status?: CustomerUpdateStatus;
+  photoUrl?: string;
+  referenceName?: string;
+  recoveryNotes?: string;
+  documents?: string;
 }
 
 export interface CustomerListResponse {

@@ -1376,6 +1376,14 @@ components:
         status:
           type: string
           enum: [active, inactive, blocked]
+        photoUrl:
+          type: ["string", "null"]
+        referenceName:
+          type: ["string", "null"]
+        recoveryNotes:
+          type: ["string", "null"]
+        documents:
+          type: ["string", "null"]
         totalTokens:
           type: integer
         totalLoans:
@@ -1414,6 +1422,14 @@ components:
         status:
           type: string
           enum: [active, inactive, blocked]
+        photoUrl:
+          type: string
+        referenceName:
+          type: string
+        recoveryNotes:
+          type: string
+        documents:
+          type: string
 
     CustomerUpdate:
       type: object
@@ -1443,6 +1459,14 @@ components:
         status:
           type: string
           enum: [active, inactive, blocked]
+        photoUrl:
+          type: string
+        referenceName:
+          type: string
+        recoveryNotes:
+          type: string
+        documents:
+          type: string
 
     CustomerListResponse:
       type: object

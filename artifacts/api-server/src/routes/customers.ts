@@ -69,7 +69,7 @@ router.get("/customers", async (req, res): Promise<void> => {
 });
 
 router.post("/customers", async (req, res): Promise<void> => {
-  const { name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status } = req.body;
+  const { name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status, photoUrl, referenceName, recoveryNotes, documents } = req.body;
   if (!name || !mobile || !branchId) {
     res.status(400).json({ error: "name, mobile, branchId required" });
     return;
@@ -77,7 +77,7 @@ router.post("/customers", async (req, res): Promise<void> => {
   const referenceNumber = await getNextRef();
   const [customer] = await db
     .insert(customersTable)
-    .values({ name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status: status ?? "active", referenceNumber })
+    .values({ name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status: status ?? "active", referenceNumber, photoUrl, referenceName, recoveryNotes, documents })
     .returning();
   res.status(201).json({ ...customer, totalTokens: 0, totalLoans: 0, totalPaid: 0, createdAt: customer.createdAt.toISOString() });
 });
@@ -107,10 +107,10 @@ router.get("/customers/:id", async (req, res): Promise<void> => {
 
 router.patch("/customers/:id", async (req, res): Promise<void> => {
   const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
-  const { name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status } = req.body;
+  const { name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status, photoUrl, referenceName, recoveryNotes, documents } = req.body;
   const [customer] = await db
     .update(customersTable)
-    .set({ name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status })
+    .set({ name, mobile, alternateMobile, email, aadhaar, pan, address, city, nomineeName, nomineeRelation, branchId, status, photoUrl, referenceName, recoveryNotes, documents })
     .where(eq(customersTable.id, id))
     .returning();
   if (!customer) { res.status(404).json({ error: "Customer not found" }); return; }

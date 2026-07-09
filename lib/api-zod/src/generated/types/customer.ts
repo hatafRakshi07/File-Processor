@@ -32,6 +32,14 @@ export interface Customer {
   /** @nullable */
   branchName?: string | null;
   status: CustomerStatus;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  referenceName?: string | null;
+  /** @nullable */
+  recoveryNotes?: string | null;
+  /** @nullable */
+  documents?: string | null;
   totalTokens?: number;
   totalLoans?: number;
   totalPaid?: number;

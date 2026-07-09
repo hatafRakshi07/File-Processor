@@ -35,6 +35,7 @@ export const giftDistributionsTable = pgTable("gift_distributions", {
   giftId: integer("gift_id").notNull(),
   customerId: integer("customer_id").notNull(),
   committeeId: integer("committee_id"),
+  tokenId: integer("token_id"),
   lotteryId: integer("lottery_id"),
   quantity: integer("quantity").notNull().default(1),
   distributionDate: date("distribution_date", { mode: "string" }).notNull(),

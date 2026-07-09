@@ -2,7 +2,7 @@ import { pgTable, serial, text, integer, timestamp, pgEnum, numeric } from "driz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const paymentModeEnum = pgEnum("payment_mode", ["cash", "upi", "bank", "card"]);
+export const paymentModeEnum = pgEnum("payment_mode", ["cash", "upi", "bank", "card", "cheque"]);
 export const collectionVerificationStatusEnum = pgEnum("collection_verification_status", ["pending", "verified", "rejected"]);
 
 export const collectionsTable = pgTable("collections", {
