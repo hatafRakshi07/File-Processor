@@ -68,8 +68,8 @@ app.use("/api", router);
 // ---------------------------------------------------------------------------
 if (process.env.NODE_ENV === "production") {
   const __serverDir = dirname(fileURLToPath(import.meta.url));
-  const bissiDist = resolve(__serverDir, "../../bissi-app/dist/public");
-  const collectorDist = resolve(__serverDir, "../../collector-app/dist");
+  const bissiDist = resolve(__serverDir, "./public");
+  const collectorDist = resolve(__serverDir, "./collector");
 
   // Collector app — must be registered before the root static handler
   app.use("/collector", express.static(collectorDist));
