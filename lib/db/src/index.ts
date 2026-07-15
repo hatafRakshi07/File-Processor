@@ -15,9 +15,48 @@ function getPool() {
     );
   }
   if (!poolInstance) {
-    poolInstance = new Pool({ connectionString: url });
+    poolInstance = new Pool({
+      connectionString: url,
+      // Production-grade pool settings
+      max: parseInt(process.env.DB_POOL_MAX ?? "10", 10),
+      min: parseInt(process.env.DB_POOL_MIN ?? "2", 10),
+      idleTimeoutMillis: 30_000,           // release idle clients after 30s
+      connectionTimeoutMillis: 5_000,      // fail fast if DB is unreachable
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10_000,
+      // SSL for cloud DBs (Neon, Supabase, Railway, etc.)
+      ...(process.env.DATABASE_SSL !== "false" && url.includes("ssl=false")
+        ? {}
+        : process.env.DATABASE_SSL === "true"
+          ? { ssl: { rejectUnauthorized: true } }
+          : {}),
+    });
+
+    // Log pool errors so they surface in prod logs instead of crashing
+    poolInstance.on("error", (err) => {
+      console.error("[pg-pool] Unexpected pool error", err.message);
+    });
   }
   return poolInstance;
+}
+
+/** Drain the pool gracefully — call on SIGTERM/SIGINT. */
+export async function closePool(): Promise<void> {
+  if (poolInstance) {
+    await poolInstance.end();
+    poolInstance = null;
+    dbInstance = null;
+  }
+}
+
+/** Ping the DB — used by the health-check endpoint. */
+export async function pingDb(): Promise<void> {
+  const client = await getPool().connect();
+  try {
+    await client.query("SELECT 1");
+  } finally {
+    client.release();
+  }
 }
 
 function getDb() {

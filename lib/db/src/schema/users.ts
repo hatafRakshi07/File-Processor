@@ -18,6 +18,7 @@ export const usersTable = pgTable("users", {
   name: text("name").notNull(),
   role: userRoleEnum("role").notNull().default("collector"),
   branchId: integer("branch_id"),
+  customerId: integer("customer_id"),   // links a customer-role user to their customer record
   email: text("email"),
   phone: text("phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

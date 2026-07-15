@@ -36,6 +36,8 @@ import {
   Moon,
   Sun,
   ChevronRight,
+  FileText,
+  UserCircle,
 } from "lucide-react";
 
 const ROLE_BADGE_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
@@ -78,7 +80,10 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { icon: AlertTriangle, label: "Recovery", href: "/recovery", roles: ["super_admin","owner","branch_manager","accountant","collector"] },
   { icon: Briefcase, label: "Office", href: "/office", roles: ["super_admin","owner","branch_manager","accountant"] },
   { icon: Upload, label: "Import", href: "/import", roles: ["super_admin","owner","branch_manager"] },
+  { icon: FileText, label: "Invoices", href: "/invoices", roles: ["super_admin","owner","branch_manager","accountant"] },
   { icon: BarChart3, label: "Reports", href: "/reports", roles: ["super_admin","owner","branch_manager","accountant"] },
+  // Customer self-service — only shown to customer role
+  { icon: UserCircle, label: "My Profile", href: "/profile", roles: ["customer"] },
 ];
 
 function useDarkMode() {

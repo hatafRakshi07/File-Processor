@@ -45,6 +45,32 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
+    // Emit source maps only for debugging — disable in prod if not using an error tracker
+    sourcemap: process.env.NODE_ENV !== 'production',
+    // Warn on chunks > 500 kB (Vite default is 500 kB, we keep it explicit)
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        // Split vendor libraries for better long-term caching
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('wouter')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@tanstack')) {
+              return 'vendor-query';
+            }
+            if (id.includes('@radix-ui') || id.includes('lucide-react') || id.includes('class-variance-authority') || id.includes('tailwind-merge')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('recharts') || id.includes('d3')) {
+              return 'vendor-charts';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
   },
   server: {
     port,

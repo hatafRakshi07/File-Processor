@@ -15,3 +15,4 @@ export * from "./office";
 export * from "./notifications";
 export * from "./installments";
 export * from "./ledger";
+export * from "./invoices";

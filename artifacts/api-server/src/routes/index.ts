@@ -18,6 +18,8 @@ import recoveryRouter from "./recovery";
 import officeRouter from "./office";
 import importsRouter from "./imports";
 import notificationsRouter from "./notifications";
+import invoicesRouter from "./invoices";
+import profileRouter from "./profile";
 
 const router: IRouter = Router();
 
@@ -71,5 +73,11 @@ router.use(requireRole("super_admin", "owner", "branch_manager"), importsRouter)
 
 // Notifications — all authenticated roles
 router.use(notificationsRouter);
+
+// Invoices — finance roles
+router.use(requireRole("super_admin", "owner", "branch_manager", "accountant"), invoicesRouter);
+
+// Customer self-service profile — all authenticated roles (customers read their own data)
+router.use(profileRouter);
 
 export default router;

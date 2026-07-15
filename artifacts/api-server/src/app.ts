@@ -2,6 +2,8 @@ import express, { type Express, type Request, type Response, type NextFunction }
 import cors from "cors";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
+import { rateLimit } from "express-rate-limit";
+import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import router from "./routes";
@@ -9,13 +11,28 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the first proxy hop (Replit, Vercel, nginx) so rate-limiters see real IPs
+app.set("trust proxy", 1);
+
 // ---------------------------------------------------------------------------
 // Security headers
 // ---------------------------------------------------------------------------
 app.use(
   (helmet as any)({
-    // Allow inline scripts needed by the frontend in dev; tighten in production
-    contentSecurityPolicy: process.env.NODE_ENV === "production",
+    contentSecurityPolicy: process.env.NODE_ENV === "production"
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"], // Tailwind CSS requires this
+            imgSrc: ["'self'", "data:", "blob:"],
+            fontSrc: ["'self'", "data:"],
+            connectSrc: ["'self'"],
+            frameAncestors: ["'none'"],
+          },
+        }
+      : false,
+    crossOriginEmbedderPolicy: false, // allow fonts/images from same-origin in SPA
   }),
 );
 
@@ -33,10 +50,34 @@ app.use(
           if (!origin || allowedOrigins.includes(origin)) cb(null, true);
           else cb(new Error(`CORS: origin '${origin}' not allowed`));
         }
-      : true, // allow all origins when CORS_ORIGINS is not set (dev / behind reverse proxy)
+      : true,
     credentials: true,
   }),
 );
+
+// ---------------------------------------------------------------------------
+// Request correlation ID — injected as X-Request-Id header + log field
+// ---------------------------------------------------------------------------
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const id = (req.headers["x-request-id"] as string | undefined) ?? randomUUID();
+  (req as any).id = id;
+  res.setHeader("X-Request-Id", id);
+  next();
+});
+
+// ---------------------------------------------------------------------------
+// Global API rate limiter (generous — just blocks sustained floods)
+// Per-endpoint limiters (e.g. login) are tighter and defined in each route.
+// ---------------------------------------------------------------------------
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,  // 1 minute window
+  max: parseInt(process.env.RATE_LIMIT_MAX ?? "300", 10),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please slow down." },
+  skip: (req) => req.path === "/api/healthz", // never rate-limit health checks
+});
+app.use("/api", globalLimiter);
 
 // ---------------------------------------------------------------------------
 // Request logging & body parsing
@@ -44,9 +85,10 @@ app.use(
 app.use(
   (pinoHttp as any)({
     logger,
+    genReqId: (req: Request) => (req as any).id,
     serializers: {
       req(req: Request) {
-        return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
+        return { id: (req as any).id, method: req.method, url: req.url?.split("?")[0] };
       },
       res(res: Response) {
         return { statusCode: res.statusCode };

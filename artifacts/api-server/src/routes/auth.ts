@@ -89,6 +89,7 @@ router.post("/auth/login", loginLimiter, async (req: Request, res: Response): Pr
       name: user.name,
       role: user.role,
       branchId: user.branchId,
+      customerId: user.customerId ?? null,
       email: user.email,
       phone: user.phone,
     },
@@ -126,6 +127,7 @@ router.get("/auth/me", async (req: Request, res: Response): Promise<void> => {
     name: user.name,
     role: user.role,
     branchId: user.branchId,
+    customerId: user.customerId ?? null,
     email: user.email,
     phone: user.phone,
   });
