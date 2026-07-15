@@ -2,13 +2,14 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
-import esbuildPluginPino from "esbuild-plugin-pino";
 import { rm } from "node:fs/promises";
-
-// Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
-globalThis.require = createRequire(import.meta.url);
+import { readFileSync } from "node:fs";
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(path.resolve(artifactDir, "package.json"), "utf8"));
+const deps = Object.keys(pkg.dependencies || {});
+const devDeps = Object.keys(pkg.devDependencies || {});
+const externalDeps = [...deps, ...devDeps].filter(name => !name.startsWith("@workspace/"));
 
 async function buildAll() {
   const distDir = path.resolve(artifactDir, "dist");
@@ -28,6 +29,7 @@ async function buildAll() {
     // - uses native modules and loads them dynamically (e.g. sharp)
     // - use path traversal to read files (e.g. @google-cloud/secret-manager loads sibling .proto files)
     external: [
+      ...externalDeps,
       "*.node",
       "sharp",
       "better-sqlite3",
@@ -102,10 +104,6 @@ async function buildAll() {
       "electron",
     ],
     sourcemap: "linked",
-    plugins: [
-      // pino relies on workers to handle logging, instead of externalizing it we use a plugin to handle it
-      esbuildPluginPino({ transports: ["pino-pretty"] })
-    ],
     // Make sure packages that are cjs only (e.g. express) but are bundled continue to work in our esm output file
     banner: {
       js: `import { createRequire as __bannerCrReq } from 'node:module';
